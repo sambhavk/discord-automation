@@ -1,0 +1,36 @@
+function postToDiscord(reminder, webhookLink) {
+  const url = webhookLink
+
+  const message = {
+    "content": reminder
+  }
+
+  const options = {
+    'method': 'post',
+    'payload': message
+  }
+
+  const response = UrlFetchApp.fetch(url, options)
+  console.log(response)
+}
+
+function readGoogleSheet(){
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const ws = ss.getSheetByName("Schedule")
+
+  for(i = 0; i < ws.getMaxRows(); i++) {
+      var message = {
+      "Student Name" : ws.getRange(ws.getMaxRows(),8).getNextDataCell(SpreadsheetApp.Direction.UP).offset(1, -7).getValue(),
+      "Subject" : ws.getRange(ws.getMaxRows(),8).getNextDataCell(SpreadsheetApp.Direction.UP).offset(1, -6).getValue(),
+      "Teacher" : ws.getRange(ws.getMaxRows(),8).getNextDataCell(SpreadsheetApp.Direction.UP).offset(1, -5).getValue(),
+      "Zoom link" : ws.getRange(ws.getMaxRows(),8).getNextDataCell(SpreadsheetApp.Direction.UP).offset(1, -3).getValue(),
+      "Date" : ws.getRange(ws.getMaxRows(),8).getNextDataCell(SpreadsheetApp.Direction.UP).offset(1, -2).getValue()
+    }
+
+    const webhookLink = ws.getRange(ws.getMaxRows(),8).getNextDataCell(SpreadsheetApp.Direction.UP).offset(1, -4).getValue()
+
+    postToDiscord(message, webhookLink)
+
+    ws.getRange(ws.getMaxRows(),8).getNextDataCell(SpreadsheetApp.Direction.UP).offset(1, 0).setValue("posted")
+  }
+}
